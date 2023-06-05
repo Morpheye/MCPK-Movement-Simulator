@@ -9,11 +9,6 @@ import mcpk.utils.Arguments;
 
 public class FunctionSneakSprintJump extends Function {
 
-	public FunctionSneakSprintJump(Player player) {
-		super(player);
-		// TODO Auto-generated constructor stub
-	}
-
 	@Override
 	public String[] names() {
 		// TODO Auto-generated method stub
@@ -21,7 +16,7 @@ public class FunctionSneakSprintJump extends Function {
 	}
 
 	@Override
-	public void run(int duration, float facing, ArrayList<Character> modifiers, HashMap<String, Double> effects)
+	public void run(Player player, int duration, float facing, ArrayList<Character> modifiers, HashMap<String, Double> effects)
 			throws DurationException {
 		Arguments args = new Arguments();
 		args.replace("duration", 1);

@@ -2,10 +2,38 @@ package mcpk;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 
+import mcpk.functions.Function;
+import mcpk.functions.walk.*;
+import mcpk.functions.sprint.*;
+import mcpk.functions.sneaksprint.*;
+import mcpk.functions.sneak.*;
+import mcpk.functions.stop.*;
+
 public class Parser {
+	
+	public static ArrayList<Function> functions = functionInit();
+	private static ArrayList<Function> functionInit() {
+		ArrayList<Function> functions;
+		functions = new ArrayList<Function>();
+		functions.addAll(Arrays.asList(new Function[] {
+				new FunctionWalk(), new FunctionWalk45(), new FunctionWalkAir(),
+				new FunctionWalk45Air(), new FunctionWalkJump(), new FunctionWalkJump45(),
+				new FunctionSprint(), new FunctionSprint45(), new FunctionSprintAir(), new FunctionSprint45Air(),
+				new FunctionLSprintJump(), new FunctionRSprintJump(), new FunctionLSprintJump45(), new FunctionRSprintJump45(),
+				new FunctionSprintJump(), new FunctionSprintJump45(),
+				new FunctionSneak(), new FunctionSneak45(), new FunctionSneakAir(),
+				new FunctionSneak45Air(), new FunctionSneakJump(), new FunctionSneakJump45(),
+				new FunctionSneakSprint(), new FunctionSneakSprint45(), new FunctionSneakSprintAir(), new FunctionSneakSprint45Air(),
+				new FunctionLSneakSprintJump(), new FunctionRSneakSprintJump(), new FunctionLSneakSprintJump45(), new FunctionRSneakSprintJump45(),
+				new FunctionSneakSprintJump(), new FunctionSneakSprintJump45(),
+				new FunctionStop(), new FunctionStopAir(), new FunctionStopJump()
+		}));
+		return functions;
+	}
 	
 	public static void parse(Player player, String text) throws Exception {
 		int state = 0;
@@ -287,27 +315,29 @@ public class Parser {
 			run_function(player, current_function, duration, facing, modifiers, effects);
 		}
 		
+		player.updateMM(false);
+		
 		return;
 	}
 	
 	//identify and run command
 	static void run_function(Player player, String function, int duration, float facing, ArrayList<Character> modifiers, HashMap<String,Double> effects) throws Exception {
-		Class<?> playerclass = player.getClass();
-		@SuppressWarnings("rawtypes")
-		Class[] parameters = {int.class, float.class, ArrayList.class, HashMap.class};
-		Method method = playerclass.getDeclaredMethod(function.toLowerCase(), parameters);
-		method.invoke(player, duration, facing, modifiers, effects);
-			
+		for (Function f : functions) {
+			for (String name : f.names()) {
+				if (name.equals(function.toLowerCase())) {
+					f.run(player, duration, facing, modifiers, effects);
+					return;
+				}
+		}}
+		
+		throw new ParserException("Unrecognized function");
 	}
-	
-	//errors
-	
+
 	@SuppressWarnings("serial")
 	static class ParserException extends Exception {
 		public ParserException(String message) {
 			super(message);
 		}
 	}
-	
 	
 }

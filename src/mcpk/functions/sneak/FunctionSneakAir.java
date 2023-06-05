@@ -9,17 +9,13 @@ import mcpk.utils.Arguments;
 
 public class FunctionSneakAir extends Function {
 	
-	public FunctionSneakAir(Player player) {
-		super(player);
-	}
-
 	@Override
 	public String[] names() {
 		return new String[] {"wa", "ca", "walkair", "crouchair"};
 	}
 
 	@Override
-	public void run(int duration, float facing, ArrayList<Character> modifiers, HashMap<String, Double> effects) throws DurationException {
+	public void run(Player player, int duration, float facing, ArrayList<Character> modifiers, HashMap<String, Double> effects) throws DurationException {
 		Arguments args = new Arguments();
 		args.replace("duration", Math.abs(duration));
 		args.replace("facing", (float) Math.toRadians(facing));

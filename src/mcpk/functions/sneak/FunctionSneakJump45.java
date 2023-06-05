@@ -8,10 +8,6 @@ import mcpk.functions.Function;
 import mcpk.utils.Arguments;
 
 public class FunctionSneakJump45 extends Function {
-	
-	public FunctionSneakJump45(Player player) {
-		super(player);
-	}
 
 	@Override
 	public String[] names() {
@@ -19,7 +15,7 @@ public class FunctionSneakJump45 extends Function {
 	}
 
 	@Override
-	public void run(int duration, float facing, ArrayList<Character> modifiers, HashMap<String, Double> effects) throws DurationException {
+	public void run(Player player, int duration, float facing, ArrayList<Character> modifiers, HashMap<String, Double> effects) throws DurationException {
 		Arguments args = new Arguments();
 		args.replace("duration", 1);
 		args.replace("facing", (float) Math.toRadians(facing));

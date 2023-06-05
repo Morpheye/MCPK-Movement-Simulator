@@ -8,15 +8,12 @@ import mcpk.utils.Arguments;
 
 public abstract class Function {
 	
-	protected Player player;
-	
-	public Function(Player player) {
-		this.player = player;
+	public Function() {
 	}
 	
 	public abstract String[] names();
 	
-	public abstract void run(int duration, float facing, ArrayList<Character> modifiers, HashMap<String,Double> effects) throws DurationException, InvalidKeypressException;
+	public abstract void run(Player player, int duration, float facing, ArrayList<Character> modifiers, HashMap<String,Double> effects) throws DurationException, InvalidKeypressException;
 	
 	@SuppressWarnings("serial")
 	public static class InvalidKeypressException extends Exception {
@@ -33,7 +30,7 @@ public abstract class Function {
 	}
 	
 	//effect checking
-	static protected void checkModifiers(ArrayList<Character> modifiers, Arguments args, int duration) throws DurationException {
+	protected static void checkModifiers(ArrayList<Character> modifiers, Arguments args, int duration) throws DurationException {
 		if (!modifiers.isEmpty()) { //modifiers
 			if (duration < 0) throw new DurationException();
 			int facingChange = 0;
@@ -64,13 +61,13 @@ public abstract class Function {
 		
 	}
 
-	static protected void checkNoModifiers(ArrayList<Character> modifiers) throws InvalidKeypressException {
+	protected static void checkNoModifiers(ArrayList<Character> modifiers) throws InvalidKeypressException {
 		if (!modifiers.isEmpty()) {
 			throw new InvalidKeypressException("This function does not allow key modifiers.");
 		}
 	}
 
-	static protected void checkEffects(HashMap<String,Double> effects, Arguments args, int duration) {
+	protected static void checkEffects(HashMap<String,Double> effects, Arguments args, int duration) {
 		if (effects.containsKey("slip")) args.replace("slip", effects.get("slip"));
 		if (effects.containsKey("blocking")) args.replace("blocking", effects.get("blocking"));
 		if (effects.containsKey("speed")) args.replace("speed", effects.get("speed"));
