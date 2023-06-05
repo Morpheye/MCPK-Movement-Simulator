@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 
 public class Parser {
-
+	
 	public static void parse(Player player, String text) throws Exception {
 		int state = 0;
 		
@@ -225,12 +225,12 @@ public class Parser {
 			} else if (state == 4) { //checking for extra modifiers
 				if (text.charAt(i) == ')') { //execute and end function
 					if (text.charAt(i-1) != ',' && text.charAt(i-1) != '(') { //if prev is not ( or , 
-							if (variables.containsKey(current_argument_value)) {
+							if (variables.containsKey(current_argument_value)) { //put argument
 								effects.put(current_argument.toLowerCase(), (double) variables.get(current_argument_value));
 							} else {
-								try {
+								try { //check if the thing is a double
 									effects.put(current_argument.toLowerCase(), Double.parseDouble(current_argument_value));	
-								} catch (Exception e) {
+								} catch (Exception e) { //if it is not a double it is a boolean
 									boolean bool = Boolean.parseBoolean(current_argument_value.toLowerCase());
 									if (bool) effects.put(current_argument.toLowerCase(), 1.0);
 									else effects.put(current_argument.toLowerCase(), 0.0);
@@ -258,9 +258,9 @@ public class Parser {
 						if (variables.containsKey(current_argument_value)) {
 							effects.put(current_argument.toLowerCase(), (double) variables.get(current_argument_value));
 						} else {
-							try {
+							try { //check if the thing is a double
 								effects.put(current_argument.toLowerCase(), Double.parseDouble(current_argument_value));	
-							} catch (Exception e) {
+							} catch (Exception e) { //if it is not a double it is a boolean
 								boolean bool = Boolean.parseBoolean(current_argument_value.toLowerCase());
 								if (bool) effects.put(current_argument.toLowerCase(), 1.0);
 								else effects.put(current_argument.toLowerCase(), 0.0);

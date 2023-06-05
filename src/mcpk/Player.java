@@ -1,5 +1,6 @@
 package mcpk;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -8,7 +9,6 @@ public class Player {
 	//coords
 	public double x = 0.0;
 	public double z = 0.0;
-
 	public double vx = 0.0;
 	public double vz = 0.0;
 	
@@ -686,17 +686,25 @@ public class Player {
 	void move(Arguments args) {
 		//defining
 		int duration = (int) args.get("duration");
-		boolean airborne = (Boolean) args.get("airborne");
+		boolean airborne = (boolean) args.get("airborne");
 		int forward = (int) args.get("forward");
-		boolean strafing = (Boolean) args.get("strafing");
-		boolean sprinting = (Boolean) args.get("sprinting");
-		boolean sneaking =  (Boolean) args.get("sneaking");
-		boolean blocking;
-		if ((Double) args.get("blocking") == 1.0) blocking = true;
-		else blocking = false;
-		boolean jumping = (Boolean) args.get("jumping");
+		boolean strafing = (boolean) args.get("strafing");
+		boolean sprinting = (boolean) args.get("sprinting");
+		boolean sneaking =  (boolean) args.get("sneaking");
+		boolean jumping = (boolean) args.get("jumping");
 		float facing = (float) args.get("facing");
 		float facing_raw = (float) args.get("facing_raw");
+		
+		//modifiers
+		boolean blocking = ((double) args.get("blocking") == 1.0) ? true : false;
+		boolean soulsand = ((double) args.get("soulsand") == 1.0) ? true : false;
+		
+		//potions
+		int swiftness = (int) (double) args.get("swiftness");
+		int slowness = (int) (double) args.get("slowness");
+		
+		double effectMult = (1 + 0.2*swiftness) * (1 - 0.15*slowness);
+		if (effectMult <= 0) effectMult = 0;
 		
 		//stuff starts here
 		for (int i=1;i<=Math.abs(duration);i++) {
@@ -725,13 +733,8 @@ public class Player {
 			this.x += this.vx;
 			
 			//inertia threshold
-			if (Math.abs(this.vz * last_slip * 0.91F) < inertia_threshold) {
-				this.vz = 0;
-			}
-			
-			if (Math.abs(this.vx * last_slip * 0.91F) < inertia_threshold) {
-				this.vx = 0;
-			}
+			if (Math.abs(this.vz * last_slip * 0.91F) < inertia_threshold) this.vz = 0;
+			if (Math.abs(this.vx * last_slip * 0.91F) < inertia_threshold) this.vx = 0;
 
 			//speed calculations
 			if (airborne == true) { //air velocity
@@ -739,15 +742,15 @@ public class Player {
 				this.vx = (this.vx * last_slip * 0.91F) + (forward * 0.02F * multiplier * -MathHelper.sin(facing));
 			}
 			else if (jumping == true) { //jump velocity
-				this.vz = (this.vz * last_slip * 0.91F) + (forward * 0.1F * multiplier * (0.216F / (slip * slip * slip)) * MathHelper.cos(facing));
-				this.vx = (this.vx * last_slip * 0.91F) + (forward * 0.1F * multiplier * (0.216F / (slip * slip * slip)) * -MathHelper.sin(facing));
+				this.vz = (this.vz * last_slip * 0.91F) + (forward * 0.1F * multiplier * effectMult * (0.216F / (slip * slip * slip)) * MathHelper.cos(facing));
+				this.vx = (this.vx * last_slip * 0.91F) + (forward * 0.1F * multiplier * effectMult * (0.216F / (slip * slip * slip)) * -MathHelper.sin(facing));
 				if (sprinting == true) { 
 					this.vz = this.vz + (forward * 0.2F * MathHelper.cos(facing_raw));
 					this.vx = this.vx + (forward * 0.2F * -MathHelper.sin(facing_raw));
 				}
 			} else { //ground velocity
-				this.vz = (this.vz * last_slip * 0.91F) + (forward * 0.1F * multiplier * (0.216F / (slip * slip * slip)) * MathHelper.cos(facing));
-				this.vx = (this.vx * last_slip * 0.91F) + (forward * 0.1F * multiplier * (0.216F / (slip * slip * slip)) * -MathHelper.sin(facing));
+				this.vz = (this.vz * last_slip * 0.91F) + (forward * 0.1F * multiplier * effectMult * (0.216F / (slip * slip * slip)) * MathHelper.cos(facing));
+				this.vx = (this.vx * last_slip * 0.91F) + (forward * 0.1F * multiplier * effectMult * (0.216F / (slip * slip * slip)) * -MathHelper.sin(facing));
 			}
 			
 			last_slip = slip;
@@ -812,19 +815,24 @@ public class Player {
 
 	void checkEffects(HashMap<String,Double> effects, Arguments args, int duration) {
 		if (effects.containsKey("slip")) args.replace("slip", effects.get("slip"));
-		if (effects.containsKey("swiftness")) args.replace("swiftness", effects.get("swiftness"));
-		if (effects.containsKey("speed")) args.replace("speed", effects.get("speed"));
-		if (effects.containsKey("slowness")) args.replace("slowness", effects.get("slowness"));
 		if (effects.containsKey("blocking")) args.replace("blocking", effects.get("blocking"));
+		if (effects.containsKey("speed")) args.replace("speed", effects.get("speed"));
+		
+		if (effects.containsKey("swiftness")) args.replace("swiftness", effects.get("swiftness"));
+		if (effects.containsKey("slowness")) args.replace("slowness", effects.get("slowness"));
 		
 	}
 	
+	public static byte df = 6;
+	
 	//non-calculation methods
 	public void print() {
-		System.out.println("vz: " + this.vz);
-		System.out.println("z: " + this.z);
-		System.out.println("vx: " + this.vx);
-		System.out.println("x: " + this.x);
+		DecimalFormat formatting = new DecimalFormat("#");
+		formatting.setMaximumFractionDigits(df);
+		System.out.println("vz: " + formatting.format(this.vz));
+		System.out.println("z: " + formatting.format(this.z));
+		System.out.println("vx: " + formatting.format(this.vx));
+		System.out.println("x: " + formatting.format(this.x));
 	}
 
 }
