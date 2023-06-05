@@ -1,4 +1,4 @@
-package mcpk;
+package mcpk.utils;
 
 import java.util.HashMap;
 

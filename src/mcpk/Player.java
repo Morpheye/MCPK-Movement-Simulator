@@ -4,6 +4,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import mcpk.utils.Arguments;
+import mcpk.utils.MathHelper;
+
 public class Player {
 	
 	//coords
@@ -683,7 +686,7 @@ public class Player {
 	
 	//general move function
 	
-	void move(Arguments args) {
+	public void move(Arguments args) {
 		//defining
 		int duration = (int) args.get("duration");
 		boolean airborne = (boolean) args.get("airborne");

@@ -24,7 +24,7 @@ final class Main {
 				player.print();
 			} catch (Exception e) {
 				if (input.equals("end")) break;
-				e.printStackTrace();
+				else e.printStackTrace();
 			}
 			
 		}
