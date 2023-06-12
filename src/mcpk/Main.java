@@ -20,11 +20,11 @@ final class Main {
 			System.out.println("Parsing: " + input);
 			
 			try {
-				Parser.parse(player, input);
+				(new Parser()).parse(player, input);
 				player.print();
 			} catch (Exception e) {
 				if (input.equals("end")) break;
-				else e.printStackTrace();
+				else System.out.println(e.getMessage());
 			}
 			
 		}

@@ -1,59 +1,39 @@
 package mcpk;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 
 import mcpk.functions.Function;
-import mcpk.functions.walk.*;
-import mcpk.functions.sprint.*;
-import mcpk.functions.sneaksprint.*;
-import mcpk.functions.sneak.*;
-import mcpk.functions.stop.*;
+import mcpk.functions.nonmovement.SpecialFunction;
+import mcpk.utils.ParserException;
+import mcpk.utils.ParserFunctions;
 
 public class Parser {
 	
-	public static ArrayList<Function> functions = functionInit();
-	private static ArrayList<Function> functionInit() {
-		ArrayList<Function> functions;
-		functions = new ArrayList<Function>();
-		functions.addAll(Arrays.asList(new Function[] {
-				new FunctionWalk(), new FunctionWalk45(), new FunctionWalkAir(),
-				new FunctionWalk45Air(), new FunctionWalkJump(), new FunctionWalkJump45(),
-				new FunctionSprint(), new FunctionSprint45(), new FunctionSprintAir(), new FunctionSprint45Air(),
-				new FunctionLSprintJump(), new FunctionRSprintJump(), new FunctionLSprintJump45(), new FunctionRSprintJump45(),
-				new FunctionSprintJump(), new FunctionSprintJump45(),
-				new FunctionSneak(), new FunctionSneak45(), new FunctionSneakAir(),
-				new FunctionSneak45Air(), new FunctionSneakJump(), new FunctionSneakJump45(),
-				new FunctionSneakSprint(), new FunctionSneakSprint45(), new FunctionSneakSprintAir(), new FunctionSneakSprint45Air(),
-				new FunctionLSneakSprintJump(), new FunctionRSneakSprintJump(), new FunctionLSneakSprintJump45(), new FunctionRSneakSprintJump45(),
-				new FunctionSneakSprintJump(), new FunctionSneakSprintJump45(),
-				new FunctionStop(), new FunctionStopAir(), new FunctionStopJump()
-		}));
-		return functions;
-	}
+	//globals
+	public float default_facing = 0;
+	public HashMap<String,Double> default_effects = new HashMap<String,Double>();
 	
-	public static void parse(Player player, String text) throws Exception {
+	@SuppressWarnings("unchecked")
+	public void parse(Player player, String text) throws Exception {
+		//parser variables
 		int state = 0;
-		
 		String current_function = "";
 		String current_argument = "";
 		String current_argument_value = "";
-
 		ArrayList<Character> modifiers = new ArrayList<Character>();
 		HashMap<String,Double> effects = new HashMap<String,Double>();
-		
 		int argument_num = 1;
-		
-		int duration = 1;
-		float facing = 0;
-		
+		double duration = 1;
+		float facing = default_facing;
 		String variable_name = "";
 		float variable_value = 0;
-
 		Hashtable<String,Float> variables = new Hashtable<String,Float>();
+		
+		//start zOF
+		player.xCoords.add(player.xOf); player.xCoords.add(player.xOf);
+		player.zCoords.add(player.zOf); player.zCoords.add(player.zOf);
 		
 		//start scanning
 		for (int i = 0; i < text.length(); i++) {
@@ -91,15 +71,15 @@ public class Parser {
 				} else if (text.charAt(i) == ' ') { //execute and end function
 					//run function
 					run_function(player, current_function, duration, facing, modifiers, effects);
-					
 					modifiers = new ArrayList<Character>();
-					effects = new HashMap<String,Double>();
+					effects = (HashMap<String, Double>) default_effects.clone();
 					current_argument = "";
 					current_function = "";
 					argument_num = 1;
 					duration = 1;
-					facing = 0;
+					facing = default_facing;
 					state = 0;
+					
 				} else if (text.charAt(i) == '.') { //special modifiers
 					state = 3;
 					
@@ -170,9 +150,9 @@ public class Parser {
 				} else if (text.charAt(i) == ',') { //next argument
 					if (argument_num == 1) { //set duration
 						if (variables.containsKey(current_argument)) {
-							duration = Math.round(variables.get(current_argument));
+							duration = variables.get(current_argument);
 						} else {
-							duration = Integer.parseInt(current_argument);
+							duration = Double.parseDouble(current_argument);
 						}
 					} else if (argument_num == 2) { //set facing
 						if (variables.containsKey(current_argument)) {
@@ -190,7 +170,7 @@ public class Parser {
 							if (variables.containsKey(current_argument)) {
 								duration = Math.round(variables.get(current_argument));
 							} else {
-								duration = Integer.parseInt(current_argument);
+								duration = Double.parseDouble(current_argument);
 							}
 						} else if (argument_num == 2) { //set facing
 							if (variables.containsKey(current_argument)) {
@@ -203,14 +183,13 @@ public class Parser {
 					
 					//run function
 					run_function(player, current_function, duration, facing, modifiers, effects);
-					
 					modifiers = new ArrayList<Character>();
-					effects = new HashMap<String,Double>();
+					effects = (HashMap<String, Double>) default_effects.clone();
 					current_argument = "";
 					current_function = "";
 					argument_num = 1;
 					duration = 1;
-					facing = 0;
+					facing = default_facing;
 					state = 0;
 
 				} else if (text.charAt(i) == '=') {
@@ -228,14 +207,15 @@ public class Parser {
 				} else if (text.charAt(i) == ' ') { //execute and end function
 					//run function
 					run_function(player, current_function, duration, facing, modifiers, effects);
-					
 					modifiers = new ArrayList<Character>();
+					effects = (HashMap<String, Double>) default_effects.clone();
 					current_argument = "";
 					current_function = "";
 					argument_num = 1;
 					duration = 1;
-					facing = 0;
+					facing = default_facing;
 					state = 0;
+					
 				} else if (text.charAt(i) == '.') { //SYNTAX ERROR
 					throw new ParserException("Error: Unexpected .");
 					
@@ -270,15 +250,14 @@ public class Parser {
 					
 					//run function
 					run_function(player, current_function, duration, facing, modifiers, effects);
-					
 					modifiers = new ArrayList<Character>();
-					effects = new HashMap<String,Double>();
+					effects = (HashMap<String, Double>) default_effects.clone();
 					current_argument = "";
 					current_argument_value = "";
 					current_function = "";
 					argument_num = 1;
 					duration = 1;
-					facing = 0;
+					facing = default_facing;
 					state = 0;
 
 				} else if (text.charAt(i) == ',') {
@@ -313,31 +292,49 @@ public class Parser {
 
 		if (state == 1 || state == 3) {
 			run_function(player, current_function, duration, facing, modifiers, effects);
+			modifiers = new ArrayList<Character>();
+			effects = (HashMap<String, Double>) default_effects.clone();
+			current_argument = "";
+			current_function = "";
+			argument_num = 1;
+			duration = 1;
+			facing = default_facing;
+			state = 0;
 		}
 		
-		player.updateMM(false);
+		player.finalX = player.xOf;
+		player.finalZ = player.zOf;
 		
 		return;
 	}
 	
 	//identify and run command
-	static void run_function(Player player, String function, int duration, float facing, ArrayList<Character> modifiers, HashMap<String,Double> effects) throws Exception {
-		for (Function f : functions) {
+	void run_function(Player player, String function, double arg1, float facing, ArrayList<Character> modifiers, HashMap<String,Double> effects) throws Exception {
+		for (Function f : functions) { //use arg1 as the duration
 			for (String name : f.names()) {
 				if (name.equals(function.toLowerCase())) {
-					f.run(player, duration, facing, modifiers, effects);
+					if (arg1 != (int) arg1) throw new ParserException("Duration must be an integer.");
+					f.run(player, (int) arg1, facing, modifiers, effects);
 					return;
 				}
 		}}
 		
-		throw new ParserException("Unrecognized function");
+		for (SpecialFunction f : specialFunctions) {
+			for (String name : f.names()) {
+				if (name.equals(function.toLowerCase())) {
+					f.specialRun(player, arg1, this);
+					return;
+				}
+		}}
+		
+		
+		throw new ParserException("Unrecognized function \"" + function + "\"");
 	}
+	
+	//Functions
+	public ArrayList<Function> functions = ParserFunctions.functionInit();
+	public ArrayList<SpecialFunction> specialFunctions = ParserFunctions.specialFunctionInit();
+	
 
-	@SuppressWarnings("serial")
-	static class ParserException extends Exception {
-		public ParserException(String message) {
-			super(message);
-		}
-	}
 	
 }

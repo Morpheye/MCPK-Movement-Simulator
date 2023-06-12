@@ -15,13 +15,14 @@ public class FunctionStopAir extends Function {
 	}
 
 	@Override
-	public void run(Player player, int duration, float facing, ArrayList<Character> modifiers, HashMap<String, Double> effects) throws DurationException {
+	public void run(Player player, int duration, float facing, ArrayList<Character> modifiers, HashMap<String, Double> effects) throws DurationException, InvalidKeypressException {
 		Arguments args = new Arguments();
 		args.replace("duration", Math.abs(duration));
 		args.replace("facing", (float) Math.toRadians(facing));
 		args.replace("facing_raw", (float) Math.toRadians(facing));
 		
 		checkEffects(effects, args, duration);
+		checkNoModifiers(modifiers);
 		
 		args.replace("airborne", true);
 		player.move(args);

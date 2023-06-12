@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import mcpk.Player;
 import mcpk.utils.Arguments;
+import mcpk.utils.ParserException;
 
 public abstract class Function {
 	
@@ -16,14 +17,14 @@ public abstract class Function {
 	public abstract void run(Player player, int duration, float facing, ArrayList<Character> modifiers, HashMap<String,Double> effects) throws DurationException, InvalidKeypressException;
 	
 	@SuppressWarnings("serial")
-	public static class InvalidKeypressException extends Exception {
-		public InvalidKeypressException(String message) {
-			super(message);
+	public static class InvalidKeypressException extends ParserException {
+		public InvalidKeypressException() {
+			super("This function does not allow key modifiers.");
 		}
 	}
 	
 	@SuppressWarnings("serial")
-	public static class DurationException extends Exception {
+	public static class DurationException extends ParserException {
 		public DurationException() {
 			super("Duration cannot be negative when key modifiers are present.");
 		}
@@ -63,14 +64,13 @@ public abstract class Function {
 
 	protected static void checkNoModifiers(ArrayList<Character> modifiers) throws InvalidKeypressException {
 		if (!modifiers.isEmpty()) {
-			throw new InvalidKeypressException("This function does not allow key modifiers.");
+			throw new InvalidKeypressException();
 		}
 	}
 
 	protected static void checkEffects(HashMap<String,Double> effects, Arguments args, int duration) {
 		if (effects.containsKey("slip")) args.replace("slip", effects.get("slip"));
 		if (effects.containsKey("blocking")) args.replace("blocking", effects.get("blocking"));
-		if (effects.containsKey("speed")) args.replace("speed", effects.get("speed"));
 		
 		if (effects.containsKey("swiftness")) args.replace("swiftness", effects.get("swiftness"));
 		if (effects.containsKey("slowness")) args.replace("slowness", effects.get("slowness"));

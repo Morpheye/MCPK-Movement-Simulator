@@ -11,7 +11,7 @@ public class FunctionSneakAir extends Function {
 	
 	@Override
 	public String[] names() {
-		return new String[] {"wa", "ca", "walkair", "crouchair"};
+		return new String[] {"wa", "ca", "sneakair", "crouchair"};
 	}
 
 	@Override

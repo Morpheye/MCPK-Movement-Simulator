@@ -2,12 +2,13 @@ package mcpk;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import mcpk.utils.Arguments;
 import mcpk.utils.MathHelper;
 
 public class Player {
+	
+	public static byte df = 6;
 	
 	//momentum calculation
 	public int tick = 0;
@@ -15,6 +16,9 @@ public class Player {
 	public double zOf = 0.0;
 	public double highestZ = 0, lowestZ = 0;
 	public double highestX = 0, lowestX = 0;
+	public double finalX, finalZ;
+	public ArrayList<Double> xCoords = new ArrayList<Double>();
+	public ArrayList<Double> zCoords = new ArrayList<Double>();
 	
 	//coords
 	public double x = 0.0;
@@ -29,7 +33,6 @@ public class Player {
 	public double inertia_threshold = 0.005D;
 		
 	//general move function
-	
 	public void move(Arguments args) {
 		//defining
 		int duration = (int) args.get("duration");
@@ -55,6 +58,18 @@ public class Player {
 		
 		//stuff starts here
 		for (int i=1;i<=Math.abs(duration);i++) {
+			//check previous tick
+			if (jumping) {
+				if (!xCoords.contains(this.xOf)) {
+					xCoords.add(this.xOf);
+					xCoords.add(this.xOf);
+				}
+				if (!zCoords.contains(this.zOf)) {
+					zCoords.add(this.zOf);
+					zCoords.add(this.zOf);
+				}
+			}
+			
 			//start of tick
 			tick++;
 			slip = 0F;
@@ -104,37 +119,40 @@ public class Player {
 			}
 			
 			last_slip = slip;
-			this.updateMM(airborne || jumping);
+			
+			if (!airborne) { //update momentum if airborne
+				this.updateMM();
+			}
+			
 		}
 		
 	}
-	
-	//invalid key presses
-	
-	@SuppressWarnings("serial")
-	class InvalidKeypressException extends Exception {
-		public InvalidKeypressException(String message) {
-			super(message);
-		}
-	}
-	
-	@SuppressWarnings("serial")
-	class DurationException extends Exception {
-		public DurationException() {
-			super("Duration cannot be negative when key modifiers are present.");
-		}
-	}
 
-	void updateMM(boolean airborne) {
-		if (!airborne) {
-			if (zOf > highestZ && vz > 0) highestZ = zOf;
-			if (zOf < lowestZ && vz < 0) lowestZ = zOf;
-			if (xOf > highestX && vx > 0) highestX = xOf;
-			if (xOf < lowestX && vx < 0) lowestX = xOf;
-		}
+	void updateMM() {
+		xCoords.add(xOf);
+		zCoords.add(zOf);
 	}
 	
-	public static byte df = 6;
+	public void updateBounds() {
+		xCoords.sort((c1, c2) -> Double.compare(c1, c2));
+		zCoords.sort((c1, c2) -> Double.compare(c1, c2));
+		
+		xCoords.remove(xCoords.size()-1);
+		zCoords.remove(zCoords.size()-1);
+		zCoords.remove(0);
+		xCoords.remove(0);
+		
+		if (!xCoords.contains(finalX)) xCoords.add(finalX);
+		if (!zCoords.contains(finalZ)) zCoords.add(finalZ);
+		
+		xCoords.sort((c1, c2) -> Double.compare(c1, c2));
+		zCoords.sort((c1, c2) -> Double.compare(c1, c2));
+		lowestZ = zCoords.get(0);
+		highestZ = zCoords.get(zCoords.size()-1);
+		lowestX = xCoords.get(0);
+		highestX = xCoords.get(xCoords.size()-1);
+		
+	}
 	
 	//non-calculation methods
 	public void print() {
@@ -145,7 +163,9 @@ public class Player {
 		System.out.println("vx: " + formatting.format(this.vx));
 		System.out.println("x: " + formatting.format(this.x));
 		
-		System.out.println("mm: " + formatting.format(highestZ - lowestZ));
+		this.updateBounds();
+		System.out.println("zmm: " + formatting.format(highestZ - lowestZ));
+		System.out.println("xmm: " + formatting.format(highestX - lowestX));
 	}
 
 }

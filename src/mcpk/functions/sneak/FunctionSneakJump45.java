@@ -11,7 +11,7 @@ public class FunctionSneakJump45 extends Function {
 
 	@Override
 	public String[] names() {
-		return new String[] {"snj45", "cj45", "walkjump45", "crouchjump45"};
+		return new String[] {"snj45", "cj45", "sneakjump45", "crouchjump45"};
 	}
 
 	@Override
