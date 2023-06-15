@@ -5,10 +5,12 @@ import java.util.Arrays;
 
 import mcpk.functions.Function;
 import mcpk.functions.nonmovement.SpecialFunction;
-import mcpk.functions.nonmovement.globals.FunctionFacing;
 import mcpk.functions.nonmovement.globals.FunctionSlip;
 import mcpk.functions.nonmovement.globals.FunctionSlowness;
 import mcpk.functions.nonmovement.globals.FunctionSwiftness;
+import mcpk.functions.nonmovement.position.FunctionFacing;
+import mcpk.functions.nonmovement.position.FunctionPosX;
+import mcpk.functions.nonmovement.position.FunctionPosZ;
 import mcpk.functions.nonmovement.velocity.FunctionVx;
 import mcpk.functions.nonmovement.velocity.FunctionVz;
 import mcpk.functions.sneak.FunctionSneak;
@@ -69,7 +71,7 @@ public class ParserFunctions {
 	public static ArrayList<SpecialFunction> specialFunctionInit() {
 		ArrayList<SpecialFunction> functions = new ArrayList<SpecialFunction>();
 		functions.addAll(Arrays.asList(new SpecialFunction[] {
-				new FunctionVx(), new FunctionVz(), new FunctionFacing(),
+				new FunctionVx(), new FunctionVz(), new FunctionFacing(), new FunctionPosX(), new FunctionPosZ(),
 				new FunctionSwiftness(), new FunctionSlowness(), new FunctionSlip()
 		}));
 		return functions;

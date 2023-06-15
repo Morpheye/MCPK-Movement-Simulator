@@ -158,14 +158,23 @@ public class Player {
 	public void print() {
 		DecimalFormat formatting = new DecimalFormat("#");
 		formatting.setMaximumFractionDigits(df);
-		System.out.println("vz: " + formatting.format(this.vz));
-		System.out.println("z: " + formatting.format(this.z));
-		System.out.println("vx: " + formatting.format(this.vx));
-		System.out.println("x: " + formatting.format(this.x));
-		
 		this.updateBounds();
+
+		System.out.println("z: " + formatting.format(this.z));
+		System.out.println("vz: " + formatting.format(this.vz));
 		System.out.println("zmm: " + formatting.format(highestZ - lowestZ));
+		
+
+		System.out.println("x: " + formatting.format(this.x));
+		System.out.println("vx: " + formatting.format(this.vx));
 		System.out.println("xmm: " + formatting.format(highestX - lowestX));
+		
+		System.out.println("vector: " + formatting.format(Math.hypot(this.vz, this.vx)));
+		System.out.println("angle: " + Math.atan2(-this.vx,this.vz) * 180d/Math.PI);
+		
+
+
+
 	}
 
 }

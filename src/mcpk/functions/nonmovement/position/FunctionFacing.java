@@ -1,4 +1,4 @@
-package mcpk.functions.nonmovement.globals;
+package mcpk.functions.nonmovement.position;
 
 import mcpk.Parser;
 import mcpk.Player;
