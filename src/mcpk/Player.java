@@ -8,7 +8,7 @@ import mcpk.utils.MathHelper;
 
 public class Player {
 	
-	public static byte df = 6;
+	public static byte df = 16;
 	
 	//momentum calculation
 	public int tick = 0;
@@ -77,8 +77,8 @@ public class Player {
 			
 			//movement multipliers
 			if (forward == 0) multiplier = 0;
-			if (sprinting) multiplier *= 1.3;
-			if (sneaking) multiplier *= 0.3;
+			if (sprinting) multiplier *= 1.3; //0.30000001192092896D
+			if (sneaking) multiplier *= 0.3; 
 			if (blocking) multiplier *= 0.2;
 			
 			//check for 45 strafing
@@ -102,20 +102,27 @@ public class Player {
 			if (Math.abs(this.vx * last_slip * 0.91F) < inertia_threshold) this.vx = 0;
 
 			//speed calculations
+			final float groundSpeed = 0.1F;
+			final float airSpeed = 0.02F;
+			
 			if (airborne) { //air velocity
-				this.vz = (this.vz * last_slip * 0.91F) + (forward * 0.02F * multiplier * MathHelper.cos(facing));
-				this.vx = (this.vx * last_slip * 0.91F) + (forward * 0.02F * multiplier * -MathHelper.sin(facing));
+				this.vz = (this.vz * last_slip * 0.91F) + (forward * airSpeed * multiplier * MathHelper.cos(facing));
+				this.vx = (this.vx * last_slip * 0.91F) + (forward * airSpeed * multiplier * -MathHelper.sin(facing));
 			}
 			else if (jumping) { //jump velocity
-				this.vz = (this.vz * last_slip * 0.91F) + (forward * 0.1F * multiplier * effectMult * (0.216F / (slip * slip * slip)) * MathHelper.cos(facing));
-				this.vx = (this.vx * last_slip * 0.91F) + (forward * 0.1F * multiplier * effectMult * (0.216F / (slip * slip * slip)) * -MathHelper.sin(facing));
+				this.vz = (this.vz * last_slip * 0.91F) + (forward * groundSpeed * multiplier * effectMult 
+						* (0.216F / (slip * slip * slip)) * MathHelper.cos(facing));
+				this.vx = (this.vx * last_slip * 0.91F) + (forward * groundSpeed * multiplier * effectMult 
+						* (0.216F / (slip * slip * slip)) * -MathHelper.sin(facing));
 				if (sprinting) { 
 					this.vz = this.vz + (forward * 0.2F * MathHelper.cos(facing_raw));
 					this.vx = this.vx + (forward * 0.2F * -MathHelper.sin(facing_raw));
 				}
 			} else { //ground velocity
-				this.vz = (this.vz * last_slip * 0.91F) + (forward * 0.1F * multiplier * effectMult * (0.216F / (slip * slip * slip)) * MathHelper.cos(facing));
-				this.vx = (this.vx * last_slip * 0.91F) + (forward * 0.1F * multiplier * effectMult * (0.216F / (slip * slip * slip)) * -MathHelper.sin(facing));
+				this.vz = (this.vz * last_slip * 0.91F) + (forward * groundSpeed * multiplier * effectMult 
+						* (0.216F / (slip * slip * slip)) * MathHelper.cos(facing));
+				this.vx = (this.vx * last_slip * 0.91F) + (forward * groundSpeed * multiplier * effectMult 
+						* (0.216F / (slip * slip * slip)) * -MathHelper.sin(facing));
 			}
 			
 			last_slip = slip;
