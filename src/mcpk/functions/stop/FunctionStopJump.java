@@ -18,8 +18,7 @@ public class FunctionStopJump extends Function {
 	public void run(Player player, int duration, float facing, ArrayList<Character> modifiers, HashMap<String, Double> effects) throws DurationException, InvalidKeypressException {
 		Arguments args = new Arguments();
 		args.replace("duration", 1);
-		args.replace("facing", (float) Math.toRadians(facing));
-		args.replace("facing_raw", (float) Math.toRadians(facing));
+		args.replace("facing", (float) facing);
 		
 		checkEffects(effects, args, duration);
 		checkNoModifiers(modifiers);

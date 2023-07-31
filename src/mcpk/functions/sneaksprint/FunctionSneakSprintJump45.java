@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import mcpk.Player;
 import mcpk.functions.Function;
+import mcpk.functions.Function.InvalidKeypressException;
 import mcpk.utils.Arguments;
 
 public class FunctionSneakSprintJump45 extends Function {
@@ -17,15 +18,14 @@ public class FunctionSneakSprintJump45 extends Function {
 
 	@Override
 	public void run(Player player, int duration, float facing, ArrayList<Character> modifiers, HashMap<String, Double> effects)
-			throws DurationException {
+			throws InvalidKeypressException {
 		Arguments args = new Arguments();
 		args.replace("duration", 1);
-		args.replace("facing", (float) Math.toRadians(facing));
-		args.replace("facing_raw", (float) Math.toRadians(facing));
+		args.replace("facing", (float) (facing));
 		if (duration > 0) args.replace("forward", 1);
 		else if (duration < 0) args.replace("forward", -1);
 		
-		checkModifiers(modifiers, args, duration);
+		checkNoModifiers(modifiers);
 		checkEffects(effects, args, duration);
 		
 		args.replace("sneaking", true);
@@ -33,11 +33,13 @@ public class FunctionSneakSprintJump45 extends Function {
 		args.replace("sprinting", true);
 		player.move(args);
 		
+		args.replace("facing", (float) (facing + 45));
 		args.replace("duration", Math.abs(duration) - 1);
-		args.replace("strafing", true);
+		args.replace("strafing", 1);
 		args.replace("jumping", false);
 		args.replace("airborne", true);
 		player.move(args);
+		
 		
 	}
 

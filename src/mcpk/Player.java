@@ -30,20 +30,15 @@ public class Player {
 	public double last_slip = 0.0;
 	public double multiplier = 0.0;
 	
-	public double inertia_threshold = 0.005D;
-		
 	//general move function
 	public void move(Arguments args) {
 		//defining
 		int duration = (int) args.get("duration");
 		boolean airborne = (boolean) args.get("airborne");
-		int forward = (int) args.get("forward");
-		boolean strafing = (boolean) args.get("strafing");
 		boolean sprinting = (boolean) args.get("sprinting");
 		boolean sneaking =  (boolean) args.get("sneaking");
 		boolean jumping = (boolean) args.get("jumping");
 		float facing = (float) args.get("facing");
-		float facing_raw = (float) args.get("facing_raw");
 		
 		//modifiers
 		boolean blocking = ((double) args.get("blocking") == 1.0) ? true : false;
@@ -52,9 +47,6 @@ public class Player {
 		//potions
 		int swiftness = (int) (double) args.get("swiftness");
 		int slowness = (int) (double) args.get("slowness");
-		
-		double effectMult = (1 + 0.2*swiftness) * (1 - 0.15*slowness);
-		if (effectMult <= 0) effectMult = 0;
 		
 		//stuff starts here
 		for (int i=1;i<=Math.abs(duration);i++) {
@@ -72,57 +64,89 @@ public class Player {
 			
 			//start of tick
 			tick++;
-			slip = 0F;
 			multiplier = 1;
 			
-			//movement multipliers
-			if (forward == 0) multiplier = 0;
-			if (sprinting) multiplier *= 1.3; //0.30000001192092896D
-			if (sneaking) multiplier *= 0.3; 
-			if (blocking) multiplier *= 0.2;
-			
-			//check for 45 strafing
-			if (strafing) {
-				if (sneaking) multiplier *= 0.98F * Math.sqrt(2);
-			} else multiplier *= 0.98F;
+			//reset
+			float forward = (int) args.get("forward");
+			float strafing = (int) args.get("strafing");
+			float boost = 0.2F;
 			
 			//slipperiness
 			if (airborne) slip = 1F;
-			else slip = (double) args.get("slip");
+			else slip = (float) ((double) args.get("slip"));
 			if (last_slip == 0F) last_slip = slip;
 			
-			//movement
+			if (forward < 0) {
+				//strafing *= -1F;
+				boost *= -1F;
+			}
+			
+			//move player
 			this.z += this.vz;
 			this.x += this.vx;
 			this.zOf += this.vz;
 			this.xOf += this.vx;
 			
-			//inertia threshold
-			if (Math.abs(this.vz * last_slip * 0.91F) < inertia_threshold) this.vz = 0;
-			if (Math.abs(this.vx * last_slip * 0.91F) < inertia_threshold) this.vx = 0;
-
-			//speed calculations
-			final float groundSpeed = 0.1F;
-			final float airSpeed = 0.02F;
+			//soulsand
 			
-			if (airborne) { //air velocity
-				this.vz = (this.vz * last_slip * 0.91F) + (forward * airSpeed * multiplier * MathHelper.cos(facing));
-				this.vx = (this.vx * last_slip * 0.91F) + (forward * airSpeed * multiplier * -MathHelper.sin(facing));
+			//drag
+			this.vx *= 0.91F * last_slip;
+			this.vz *= 0.91F * last_slip;
+			
+			//inertia threshold
+			if (Math.abs(this.vz) < 0.005D) this.vz = 0D;
+			if (Math.abs(this.vx) < 0.005D) this.vx = 0D;
+			
+			//movement multipliers
+			float accel = 0;
+			double drag = (float) (0.91F) * slip;
+			if (airborne) {
+				accel = 0.02F;
+				if (sprinting) accel = (float) (accel + accel * 0.3);
+			} else {
+				accel = 0.1F;
+				accel *= 0.16277136F / (drag * drag * drag);
+				if (swiftness > 0) accel = (float) (accel * (1.0D + 0.2F * (float) (swiftness)));
+				if (slowness > 0) accel = (float) (accel * Math.max(1.0D + -0.15F * (float) (slowness), 0));
+				if (sprinting) accel = (float) (accel * (1.0D + 0.3F));
 			}
-			else if (jumping) { //jump velocity
-				this.vz = (this.vz * last_slip * 0.91F) + (forward * groundSpeed * multiplier * effectMult 
-						* (0.216F / (slip * slip * slip)) * MathHelper.cos(facing));
-				this.vx = (this.vx * last_slip * 0.91F) + (forward * groundSpeed * multiplier * effectMult 
-						* (0.216F / (slip * slip * slip)) * -MathHelper.sin(facing));
-				if (sprinting) { 
-					this.vz = this.vz + (forward * 0.2F * MathHelper.cos(facing_raw));
-					this.vx = this.vx + (forward * 0.2F * -MathHelper.sin(facing_raw));
-				}
-			} else { //ground velocity
-				this.vz = (this.vz * last_slip * 0.91F) + (forward * groundSpeed * multiplier * effectMult 
-						* (0.216F / (slip * slip * slip)) * MathHelper.cos(facing));
-				this.vx = (this.vx * last_slip * 0.91F) + (forward * groundSpeed * multiplier * effectMult 
-						* (0.216F / (slip * slip * slip)) * -MathHelper.sin(facing));
+			
+			//sprintjump boost
+			if (sprinting && jumping) {
+				float angle = (float) (facing * 0.017453292F);
+				
+				this.vz += (boost * MathHelper.cos(angle));
+				this.vx -= (boost * MathHelper.sin(angle));
+			}
+			
+			if (blocking) {
+				forward *= 0.2F;
+				strafing *= 0.2F;
+			}
+			
+			//sneaking
+			if (sneaking) {
+				forward = (float) (((float) forward) * 0.3D);
+				strafing = (float) (((float) strafing) * 0.3D);
+			}
+			
+			forward *= 0.98F;
+			strafing *= 0.98F;
+			
+			float distance = (float) (strafing * strafing + forward * forward);
+			
+			if (distance >= 1.0E-4F) {
+				distance = (float) Math.sqrt(distance);
+				if (distance < 1.0F) distance = 1.0F;
+				
+				distance = accel / distance;
+				strafing = strafing * distance;
+				forward = forward * distance;
+				
+				float angle = (float) (facing * 3.14159265358979323846F / 180F);
+				
+				this.vx += (float) (strafing * MathHelper.cos(angle) - forward * MathHelper.sin(angle));
+				this.vz += (float) (forward * MathHelper.cos(angle) + strafing * MathHelper.sin(angle));
 			}
 			
 			last_slip = slip;
@@ -130,6 +154,10 @@ public class Player {
 			if (!airborne) { //update momentum if airborne
 				this.updateMM();
 			}
+			
+			if (true) continue;
+			
+
 			
 		}
 		

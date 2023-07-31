@@ -20,8 +20,7 @@ public class FunctionRSprintJump extends Function {
 			throws DurationException, InvalidKeypressException {
 		Arguments args = new Arguments();
 		args.replace("duration", 1);
-		args.replace("facing", (float) Math.toRadians(facing + 45));
-		args.replace("facing_raw", (float) Math.toRadians(facing));
+		args.replace("facing", facing);
 		if (duration > 0) args.replace("forward", 1);
 		else if (duration < 0) args.replace("forward", -1);
 
@@ -30,13 +29,12 @@ public class FunctionRSprintJump extends Function {
 		
 		args.replace("jumping", true);
 		args.replace("sprinting", true);
-		args.replace("strafing", true);
+		args.replace("strafing", -1);
 		player.move(args);
 		
-		args.replace("facing", (float) Math.toRadians(facing));
 		args.replace("duration", Math.abs(duration) - 1);
 		args.replace("jumping", false);
-		args.replace("strafing", false);
+		args.replace("strafing", 0);
 		args.replace("airborne", true);
 		player.move(args);
 		

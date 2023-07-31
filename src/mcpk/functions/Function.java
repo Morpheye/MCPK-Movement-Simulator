@@ -34,29 +34,19 @@ public abstract class Function {
 	protected static void checkModifiers(ArrayList<Character> modifiers, Arguments args, int duration) throws DurationException {
 		if (!modifiers.isEmpty()) { //modifiers
 			if (duration < 0) throw new DurationException();
-			int facingChange = 0;
-			
-			if (modifiers.contains('a')) { //strafing?
-				facingChange = facingChange - 90;
-			}
-			if (modifiers.contains('d')) {
-				facingChange = facingChange + 90;
-			}
+
 			
 			if (modifiers.contains('w')); //w + potential strafing, no change
-			else if (modifiers.contains('s')) args.replace("forward", (int) args.get("forward") * -1); //s + potential strafing
-			else args.replace("forward", 1); //only strafing
+			else if (modifiers.contains('s')) args.replace("forward", -1); //s + potential strafing
+			else args.replace("forward", 0); //only strafing
+			
 			if (modifiers.contains('w') && modifiers.contains('s')) { //WS
-				if (modifiers.contains('a') && modifiers.contains('d')) args.replace("forward", 0); // WASD user is trolling
-				else if (modifiers.contains('a') || modifiers.contains('d')) args.replace("forward", 1); // strafe only
-				else args.replace("forward", 0); //WS user is trolling
+				args.replace("forward", 0);
 			}
-			//both forward movement and strafing?
-			if ((modifiers.contains('s') || modifiers.contains('w')) && (modifiers.contains('a') || modifiers.contains('d')) && !(modifiers.contains('s') && modifiers.contains('w'))) {
-				args.replace("strafing", true); 
-				facingChange = facingChange / 2 * (int) args.get("forward");
-			} //apply facing change
-			args.replace("facing", (float) args.get("facing") + (float) Math.toRadians(facingChange));
+			
+			if (modifiers.contains('a') && modifiers.contains('d')) args.replace("strafing", 0); // WASD user is trolling
+			else if (modifiers.contains('a')) args.replace("strafing", 1);
+			else if (modifiers.contains('d')) args.replace("strafing", -1);
 			
 		} //end modifying
 		

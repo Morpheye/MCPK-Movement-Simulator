@@ -20,8 +20,7 @@ public class FunctionSprintAir extends Function {
 			throws DurationException {
 		Arguments args = new Arguments();
 		args.replace("duration", Math.abs(duration));
-		args.replace("facing", (float) Math.toRadians(facing));
-		args.replace("facing_raw", (float) Math.toRadians(facing));
+		args.replace("facing", facing);
 		if (duration > 0) args.replace("forward", 1);
 		else if (duration < 0) args.replace("forward", -1);
 

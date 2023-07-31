@@ -15,19 +15,18 @@ public class FunctionSneak45 extends Function {
 	}
 
 	@Override
-	public void run(Player player, int duration, float facing, ArrayList<Character> modifiers, HashMap<String, Double> effects) throws DurationException {
+	public void run(Player player, int duration, float facing, ArrayList<Character> modifiers, HashMap<String, Double> effects) throws InvalidKeypressException {
 		Arguments args = new Arguments();
 		args.replace("duration", Math.abs(duration));
-		args.replace("facing", (float) Math.toRadians(facing));
-		args.replace("facing_raw", (float) Math.toRadians(facing));
+		args.replace("facing", (float) (facing + 45));
 		if (duration > 0) args.replace("forward", 1);
 		else if (duration < 0) args.replace("forward", -1);
 		
-		checkModifiers(modifiers, args, duration);
+		checkNoModifiers(modifiers);
 		checkEffects(effects, args, duration);
 		
 		args.replace("sneaking", true);
-		args.replace("strafing", true);
+		args.replace("strafing", 1);
 		player.move(args);
 		
 	}
