@@ -5,8 +5,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JPanel;
+import javax.swing.Timer;
 
 import mcpk.Parser;
 import mcpk.Player;
@@ -20,13 +23,15 @@ public class VisualiserPanel extends JPanel {
 	public VisualiserPanel() {
 		this.setBackground(Color.BLACK);
 		
-		repaint();
+		Timer timer = new Timer(1000, new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				repaint();
+			}
+		});
+		
+		timer.start();
+		
 	}
-	
-	float f = -38;
-	float[] facings = {-5.3f, f, f, f, f, f, f, f, f, f, f, f, f}; //angles
-	Blockage[] blockages = {new Blockage(-0.3, 1.1375, -0.5, 0.725),
-			new Blockage(1.3, 0.7, -1.6, 1.6)}; //butterfly block blockage
 	
 	@Override
 	public void paint(Graphics g) {
@@ -34,12 +39,17 @@ public class VisualiserPanel extends JPanel {
 		g2d.setStroke(new BasicStroke(2));
 		g2d.setColor(Color.WHITE);
 		
+		float f = 48.07f;
+		float[] facings = {91.71f, f, f, f, f, f, f, f, f, f, f, f}; //angles
+		Blockage[] blockages = {new Blockage(-1.1375, 1.2, -0.725, 1.7),
+				new Blockage(-0.7, 1.7, -1.6, 1)}; //butterfly block blockage
+		
 		try {
 			parser = new Parser();
 			player = new Player();
-			parser.parse(player, "f(37) walkjump.sa(12) walk.sa | sprintjump.wd(12) sprint.wd");
-			player.x = -0.3;
-			player.z = 0.69883;
+			parser.parse(player, "f(131.22) wa.d(2) sta(9) stop | wj.sa(12) w.sa | sj.wd sneaksprintair.d wa.wd sa.wd(9) s.wd");
+			player.x = -0.545;
+			player.z = 1.7625;
 			System.out.println(player.x + " " + player.z);
 			
 			double lastX = player.x;
